@@ -1,9 +1,11 @@
 package edu.udacity.java.nano.chat;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Component;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,7 +26,14 @@ public class WebSocketChatServer {
     private static Map<String, Session> onlineSessions = new ConcurrentHashMap<>();
 
     private static void sendMessageToAll(String msg) {
-        //TODO: add send message method.
+        for (String sessionId: onlineSessions.keySet() ) {
+            try {
+                onlineSessions.get(sessionId).getBasicRemote().sendText(msg);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     /**
@@ -32,7 +41,8 @@ public class WebSocketChatServer {
      */
     @OnOpen
     public void onOpen(Session session) {
-        //TODO: add on open connection.
+        onlineSessions.put(session.getId(), session);
+        sendMessageToAll(JSON.toJSONString(new Message("", "", Message.ENTER, onlineSessions.size())));
     }
 
     /**
@@ -40,7 +50,8 @@ public class WebSocketChatServer {
      */
     @OnMessage
     public void onMessage(Session session, String jsonStr) {
-        //TODO: add send message.
+        Message msg = JSON.parseObject(jsonStr, Message.class);
+        sendMessageToAll(JSON.toJSONString(new Message(msg.getMsg(), msg.getUsername(), Message.SPEAK, onlineSessions.size())));
     }
 
     /**
@@ -48,7 +59,8 @@ public class WebSocketChatServer {
      */
     @OnClose
     public void onClose(Session session) {
-        //TODO: add close connection.
+        onlineSessions.remove((session.getId()));
+        sendMessageToAll(JSON.toJSONString(new Message("", "", Message.QUIT, onlineSessions.size())));
     }
 
     /**

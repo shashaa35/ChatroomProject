@@ -23,7 +23,7 @@ public class PricingServiceApplicationTests {
 	public void contextLoads() {
 	}
 	
-//	@Test
+	@Test
 	public void checkPrice() throws Exception {
 //		String price = PricingService.getPrice(1L).toString();
 		

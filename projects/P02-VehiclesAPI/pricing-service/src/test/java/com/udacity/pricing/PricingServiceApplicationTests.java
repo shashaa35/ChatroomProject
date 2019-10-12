@@ -27,7 +27,7 @@ public class PricingServiceApplicationTests {
 	public void checkPrice() throws Exception {
 //		String price = PricingService.getPrice(1L).toString();
 		
-		mvc.perform(get("services/price?vehicleId=1"))
+		mvc.perform(get("/services/price?vehicleId=1"))
 		.andExpect(status().isOk());
 //		.andExpect(content().string(StringContains.containsString(price)));
 	}
